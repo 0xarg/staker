@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract StakingProxy is Ownable {
-    uint256 public totalStaked;
-    mapping(address => uint256) public stakedBalances;
+    uint public totalStaked;
+    mapping(address => uint) public stakedBalance;
 
     address public implementation;
 
@@ -17,8 +17,12 @@ contract StakingProxy is Ownable {
     }
 
     fallback() external payable {
-        // Forward the call to the implementation contract
         (bool success, ) = implementation.delegatecall(msg.data);
-        require(success, "Delegatecall failed");
+        require(success, "DelegateCall failed");
+    }
+
+    receive() external payable {
+        (bool success, ) = implementation.delegatecall("");
+        require(success, "DelegateCall failed");
     }
 }
