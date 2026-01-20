@@ -4,23 +4,23 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./ApCoin.sol";
+import "./StakeX.sol";
 
 contract Staking is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     uint256 public totalStaked;
 
     mapping(address => uint256) stakeBalance;
-    mapping(address => uint256) unStakeTime;
+    mapping(address => uint256) public unStakeTime;
     mapping(address => uint256) userRewards;
     mapping(address => uint256) lastUpdated;
 
-    ApCoin public rewardToken;
+    StakeX public rewardToken;
 
     uint256[50] private __gap;
 
     function initialize(address _rewardToken) public initializer {
         __Ownable_init(msg.sender);
-        rewardToken = ApCoin(_rewardToken);
+        rewardToken = StakeX(_rewardToken);
     }
 
     function _updateReward(address user) internal {
@@ -62,12 +62,9 @@ contract Staking is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 
-    function unstake(uint256 amount) external payable {
+    function unstake() external payable {
         require(block.timestamp >= unStakeTime[msg.sender], "Locked");
-        require(
-            amount == stakeBalance[msg.sender],
-            "partial unstake forbidden"
-        );
+        uint256 amount = stakeBalance[msg.sender];
         _updateReward(msg.sender);
         stakeBalance[msg.sender] = 0;
         totalStaked -= amount;
