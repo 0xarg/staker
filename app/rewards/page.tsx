@@ -7,13 +7,21 @@ import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@/contexts/WalletContext";
 import { toast } from "@/hooks/use-toast";
 import { STAKING_PROXY } from "@/lib/config";
-import { useReadContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
 import { formatEther } from "viem";
 
 const Rewards = () => {
   const { walletAddress } = useWallet();
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+
+  const {
+    mutate,
+    isPending,
+    isSuccess,
+    data: hash,
+    error,
+  } = useWriteContract();
   const { data: userRewards, refetch: refreshRewards } = useReadContract({
     address: STAKING_PROXY,
     abi,
@@ -22,14 +30,17 @@ const Rewards = () => {
   });
 
   const rewardsSummary = {
-    totalEarned: userRewards,
+    totalEarned:
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards).slice(0, 4)
+        : "0",
     claimable:
       userRewards && typeof userRewards === "bigint"
-        ? formatEther(userRewards)
+        ? formatEther(userRewards).slice(0, 4)
         : "0",
     pending:
       userRewards && typeof userRewards === "bigint"
-        ? formatEther(userRewards)
+        ? formatEther(userRewards).slice(0, 4)
         : "0",
     nextReward: " ",
   };
@@ -68,10 +79,24 @@ const Rewards = () => {
   ];
 
   const handleClaim = () => {
+    mutate({
+      address: STAKING_PROXY,
+      abi,
+      functionName: "claimReward",
+    });
     toast({
       title: "Claiming...",
       description: "Processing your reward claim",
     });
+    if (error) {
+      console.log(error);
+    }
+    if (isSuccess) {
+      toast({
+        title: "Claimed...",
+        description: "Processed your reward claim",
+      });
+    }
   };
 
   return (
@@ -105,10 +130,8 @@ const Rewards = () => {
                   TOTAL EARNED
                 </p>
                 <p className="text-3xl font-bold">
-                  {userRewards && typeof userRewards === "bigint"
-                    ? formatEther(userRewards)
-                    : "0"}{" "}
-                  <span className="text-lg text-muted-foreground">ETH</span>
+                  {rewardsSummary.totalEarned}{" "}
+                  <span className="text-lg text-muted-foreground">StakeX</span>
                 </p>
               </div>
               <div className="p-2 border-[2px] border-foreground bg-accent text-accent-foreground">
@@ -131,7 +154,7 @@ const Rewards = () => {
                 </p>
                 <p className="text-3xl font-bold text-primary">
                   {rewardsSummary.claimable}{" "}
-                  <span className="text-lg">ETH</span>
+                  <span className="text-lg">StakeX</span>
                 </p>
               </div>
               <div className="p-2 border-[2px] border-foreground bg-primary text-primary-foreground">
@@ -154,7 +177,7 @@ const Rewards = () => {
                 </p>
                 <p className="text-3xl font-bold">
                   {rewardsSummary.pending}{" "}
-                  <span className="text-lg text-muted-foreground">ETH</span>
+                  <span className="text-lg text-muted-foreground">StakeX</span>
                 </p>
               </div>
               <div className="p-2 border-[2px] border-foreground bg-secondary text-secondary-foreground">

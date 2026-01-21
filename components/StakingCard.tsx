@@ -22,9 +22,10 @@ const StakingCard = ({
   onClaim,
 }: StakingCardProps) => {
   let isLocked; // Mock locked state
+  console.log(lockPeriod);
 
   if (lockPeriod) {
-    isLocked = true;
+    isLocked = false;
   } else {
     isLocked = false;
   }

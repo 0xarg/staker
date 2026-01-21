@@ -119,6 +119,16 @@ const Dashboard = () => {
     },
     { type: "Stake", amount: "5.0 ETH", time: "3 days ago", status: "success" },
   ];
+  const handleUnstake = () => {
+    mutate({
+      address: STAKING_PROXY,
+      abi,
+      functionName: "unstake",
+    });
+    if (error) {
+      console.log(error);
+    }
+  };
 
   if (!walletAddress) {
     return <div>Loading</div>;
@@ -184,9 +194,7 @@ const Dashboard = () => {
               userReward={userRewards ? (userRewards as string) : ""}
               userStaked={userStaked ? (userStaked as string) : ""}
               onStake={() => toast({ title: "Opening stake dialog..." })}
-              onUnstake={() =>
-                toast({ title: "Locked", description: "Stake is still locked" })
-              }
+              onUnstake={() => handleUnstake()}
               onClaim={() => toast({ title: "Claiming rewards..." })}
             />
           </div>
