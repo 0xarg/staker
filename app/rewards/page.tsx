@@ -6,16 +6,32 @@ import Navbar from "@/components/Navbar";
 import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@/contexts/WalletContext";
 import { toast } from "@/hooks/use-toast";
+import { STAKING_PROXY } from "@/lib/config";
+import { useReadContract } from "wagmi";
+import { abi } from "@/lib/abi";
+import { formatEther } from "viem";
 
 const Rewards = () => {
+  const { walletAddress } = useWallet();
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const { connect } = useWallet();
+  const { data: userRewards, refetch: refreshRewards } = useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "userRewards",
+    args: [walletAddress],
+  });
 
   const rewardsSummary = {
-    totalEarned: "2.847",
-    claimable: "0.847",
-    pending: "0.125",
-    nextReward: "23:45:12",
+    totalEarned: userRewards,
+    claimable:
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards)
+        : "0",
+    pending:
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards)
+        : "0",
+    nextReward: " ",
   };
 
   const rewardHistory = [
@@ -89,7 +105,9 @@ const Rewards = () => {
                   TOTAL EARNED
                 </p>
                 <p className="text-3xl font-bold">
-                  {rewardsSummary.totalEarned}{" "}
+                  {userRewards && typeof userRewards === "bigint"
+                    ? formatEther(userRewards)
+                    : "0"}{" "}
                   <span className="text-lg text-muted-foreground">ETH</span>
                 </p>
               </div>
@@ -266,10 +284,6 @@ const Rewards = () => {
       <WalletModal
         isOpen={isWalletModalOpen}
         onClose={() => setIsWalletModalOpen(false)}
-        onSelectWallet={(wallet) => {
-          connect(wallet);
-          toast({ title: "Connected", description: `Connected via ${wallet}` });
-        }}
       />
     </div>
   );

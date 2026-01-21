@@ -4,16 +4,26 @@ import { motion } from "framer-motion";
 import { Zap, Clock, TrendingUp, AlertTriangle, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import WalletModal from "@/components/WalletModal";
-import { useWallet } from "@/contexts/WalletContext";
 import { toast } from "@/hooks/use-toast";
+import { useWriteContract } from "wagmi";
+import { STAKING_PROXY } from "@/lib/config";
+import { abi } from "@/lib/abi";
+import { parseEther } from "viem";
 
 const Stake = () => {
+  const {
+    mutate,
+    isPending,
+    isSuccess,
+    data: hash,
+    error,
+  } = useWriteContract();
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [lockPeriod, setLockPeriod] = useState(7);
-  const { connect } = useWallet();
 
   const lockOptions = [
+    { days: 0, apy: "0%", multiplier: "1x" },
     { days: 7, apy: "6%", multiplier: "1x" },
     { days: 14, apy: "8%", multiplier: "1.2x" },
     { days: 30, apy: "10%", multiplier: "1.5x" },
@@ -30,17 +40,42 @@ const Stake = () => {
     : "0.0000";
 
   const handleStake = () => {
-    if (!amount || parseFloat(amount) < 0.01) {
+    if (!amount) {
+      console.log("erro1");
       toast({
         title: "Invalid Amount",
         description: "Minimum stake is 0.01 ETH",
       });
       return;
     }
+    const amountEth = parseEther(amount ?? "0");
+    console.log(lockPeriod);
+    console.log(amountEth);
     toast({
       title: "Staking...",
       description: `Staking ${amount} ETH for ${lockPeriod} days`,
     });
+    mutate({
+      address: STAKING_PROXY,
+      abi,
+      functionName: "stake",
+      args: [lockPeriod * 24 * 60 * 60],
+      value: BigInt(amountEth),
+    });
+
+    if (isSuccess) {
+      toast({
+        title: `Staked...`,
+        description: `Staking ${amountEth} ETH for ${lockPeriod} days`,
+      });
+    }
+    if (error) {
+      console.log(error);
+      toast({
+        title: `Error While staking`,
+        description: `Look for cosnsole,`,
+      });
+    }
   };
 
   return (
@@ -211,10 +246,6 @@ const Stake = () => {
       <WalletModal
         isOpen={isWalletModalOpen}
         onClose={() => setIsWalletModalOpen(false)}
-        onSelectWallet={(wallet) => {
-          connect(wallet);
-          toast({ title: "Connected", description: `Connected via ${wallet}` });
-        }}
       />
     </div>
   );

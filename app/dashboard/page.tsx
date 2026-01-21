@@ -17,10 +17,13 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
+import { formatEther, parseEther } from "viem";
+import { STAKING_PROXY } from "@/lib/config";
 
 const Dashboard = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { walletAddress } = useWallet();
+  console.log(walletAddress);
 
   const {
     mutate,
@@ -31,36 +34,70 @@ const Dashboard = () => {
   } = useWriteContract();
 
   const { data: totalStaked, refetch } = useReadContract({
-    address: walletAddress as `0x${string}` | undefined,
+    address: STAKING_PROXY,
     abi,
     functionName: "totalStaked",
   });
+  const { data: userStaked, refetch: refreshUser } = useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "stakeBalance",
+    args: [walletAddress],
+  });
+  const { data: unstakeTime, refetch: refreshTime } = useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "unStakeTime",
+    args: [walletAddress],
+  });
+  const { data: userRewards, refetch: refreshRewards } = useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "userRewards",
+    args: [walletAddress],
+  });
 
+  console.log("totalStaked", totalStaked);
+  console.log("userStaked", userStaked);
+  console.log("userRewards", userRewards);
+  console.log("UnStakeTime", unstakeTime);
   const stats = [
     {
       label: "TOTAL STAKED",
-      value: "1,234.56",
+      value:
+        totalStaked && typeof totalStaked === "bigint"
+          ? formatEther(totalStaked)
+          : "0",
       unit: "ETH",
       icon: Coins,
       iconColor: "bg-primary text-primary-foreground",
     },
     {
       label: "YOUR STAKE",
-      value: "12.50",
+      value:
+        userStaked && typeof userStaked === "bigint"
+          ? formatEther(userStaked)
+          : "0",
       unit: "ETH",
       icon: Wallet,
       iconColor: "bg-accent text-accent-foreground",
     },
     {
       label: "CLAIMABLE REWARDS",
-      value: "0.847",
+      value:
+        userRewards && typeof userRewards === "bigint"
+          ? formatEther(userRewards)
+          : "0",
       unit: "ETH",
       icon: Gift,
       iconColor: "bg-primary text-primary-foreground",
     },
     {
       label: "UNLOCK TIME",
-      value: "5D 12H",
+      value:
+        unstakeTime && typeof unstakeTime === "bigint"
+          ? new Date(Number(unstakeTime) * 1000).toDateString()
+          : "N/A",
       unit: "",
       icon: Clock,
       iconColor: "bg-destructive text-destructive-foreground",
@@ -82,6 +119,10 @@ const Dashboard = () => {
     },
     { type: "Stake", amount: "5.0 ETH", time: "3 days ago", status: "success" },
   ];
+
+  if (!walletAddress) {
+    return <div>Loading</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -117,7 +158,7 @@ const Dashboard = () => {
                     {stat.label}
                   </p>
                   <p className="text-3xl font-bold">
-                    {stat.value}{" "}
+                    {stat.value}
                     <span className="text-lg text-muted-foreground">
                       {stat.unit}
                     </span>
@@ -139,6 +180,9 @@ const Dashboard = () => {
           <div className="lg:col-span-2">
             <StakingCard
               isConnected={true}
+              lockPeriod={unstakeTime ? (unstakeTime as string) : ""}
+              userReward={userRewards ? (userRewards as string) : ""}
+              userStaked={userStaked ? (userStaked as string) : ""}
               onStake={() => toast({ title: "Opening stake dialog..." })}
               onUnstake={() =>
                 toast({ title: "Locked", description: "Stake is still locked" })

@@ -3,12 +3,10 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./StakeX.sol";
 
-contract Staking is Initializable, UUPSUpgradeable, OwnableUpgradeable {
+contract StakingV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     uint256 public totalStaked;
 
     mapping(address => uint256) public stakeBalance;

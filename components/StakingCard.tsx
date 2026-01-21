@@ -1,19 +1,33 @@
 import { motion } from "framer-motion";
 import { Lock, Unlock, TrendingUp, Clock } from "lucide-react";
+import { formatEther } from "viem";
 
 interface StakingCardProps {
+  userStaked: string;
+  userReward: string;
+  lockPeriod: string;
   isConnected: boolean;
   onStake: () => void;
   onUnstake: () => void;
   onClaim: () => void;
 }
 
-const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardProps) => {
-  const isLocked = true; // Mock locked state
-  const lockProgress = 65; // 65% through lock period
-  const stakedAmount = "12.50";
-  const pendingRewards = "0.847";
-  const unlockDate = "Jan 25, 2026";
+const StakingCard = ({
+  lockPeriod,
+  userStaked,
+  userReward,
+  isConnected,
+  onStake,
+  onUnstake,
+  onClaim,
+}: StakingCardProps) => {
+  let isLocked; // Mock locked state
+
+  if (lockPeriod) {
+    isLocked = true;
+  } else {
+    isLocked = false;
+  }
 
   return (
     <motion.div
@@ -25,7 +39,9 @@ const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardPr
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h3 className="section-title text-2xl">🔥 YOUR STAKE</h3>
-        <div className={`px-3 py-1 border-[2px] border-foreground font-bold text-sm uppercase ${isLocked ? 'bg-destructive text-destructive-foreground' : 'bg-accent text-accent-foreground'}`}>
+        <div
+          className={`px-3 py-1 border-[2px] border-foreground font-bold text-sm uppercase ${isLocked ? "bg-destructive text-destructive-foreground" : "bg-accent text-accent-foreground"}`}
+        >
           {isLocked ? (
             <span className="flex items-center gap-1">
               <Lock size={14} /> LOCKED
@@ -46,7 +62,12 @@ const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardPr
             <TrendingUp size={16} />
             STAKED AMOUNT
           </div>
-          <p className="text-4xl font-bold">{stakedAmount} <span className="text-xl">ETH</span></p>
+          <p className="text-4xl font-bold">
+            {userStaked && typeof userStaked === "bigint"
+              ? formatEther(userStaked)
+              : "0"}{" "}
+            <span className="text-xl">ETH</span>
+          </p>
         </div>
 
         {/* Pending Rewards */}
@@ -55,7 +76,12 @@ const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardPr
             <TrendingUp size={16} className="text-accent" />
             PENDING REWARDS
           </div>
-          <p className="text-4xl font-bold text-accent">{pendingRewards} <span className="text-xl">ETH</span></p>
+          <p className="text-4xl font-bold text-accent">
+            {userReward && typeof userReward === "bigint"
+              ? formatEther(userReward).slice(0, 5)
+              : "0"}{" "}
+            <span className="text-xl">StakeX</span>
+          </p>
         </div>
       </div>
 
@@ -66,18 +92,18 @@ const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardPr
             <Clock size={16} />
             LOCK PROGRESS
           </div>
-          <span className="text-sm font-bold">{lockProgress}%</span>
+          <span className="text-sm font-bold">{"65"}%</span>
         </div>
         <div className="progress-bar">
           <motion.div
             className="progress-fill"
             initial={{ width: 0 }}
-            animate={{ width: `${lockProgress}%` }}
+            animate={{ width: `${"lockProgress"}%` }}
             transition={{ duration: 1, delay: 0.5 }}
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2 uppercase">
-          Unlocks on {unlockDate}
+          Unlocks on {new Date(Number(lockPeriod) * 1000).toDateString()}
         </p>
       </div>
 
@@ -95,7 +121,7 @@ const StakingCard = ({ isConnected, onStake, onUnstake, onClaim }: StakingCardPr
 
         <motion.button
           onClick={onUnstake}
-          className={`btn-outline-web3 ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`btn-outline-web3 ${isLocked ? "opacity-50 cursor-not-allowed" : ""}`}
           whileHover={!isLocked ? { scale: 1.02 } : {}}
           whileTap={!isLocked ? { scale: 0.98 } : {}}
           disabled={isLocked || !isConnected}
