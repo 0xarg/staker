@@ -15,7 +15,7 @@ import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@/contexts/WalletContext";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { useReadContract, useWriteContract } from "wagmi";
+import { useBalance, useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
 import { formatEther, parseEther } from "viem";
 import { STAKING_PROXY } from "@/lib/config";
@@ -23,6 +23,11 @@ import { STAKING_PROXY } from "@/lib/config";
 const Dashboard = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { walletAddress } = useWallet();
+  const result = useBalance({
+    address: walletAddress as `0x${string}`,
+  });
+
+  console.log("------", formatEther(result.data?.value!));
   console.log(walletAddress);
 
   const {

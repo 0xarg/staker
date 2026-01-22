@@ -5,10 +5,11 @@ import { Zap, Clock, TrendingUp, AlertTriangle, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import WalletModal from "@/components/WalletModal";
 import { toast } from "@/hooks/use-toast";
-import { useWriteContract } from "wagmi";
+import { useBalance, useWriteContract } from "wagmi";
 import { STAKING_PROXY } from "@/lib/config";
 import { abi } from "@/lib/abi";
-import { parseEther } from "viem";
+import { formatEther, parseEther } from "viem";
+import { useWallet } from "@/contexts/WalletContext";
 
 const Stake = () => {
   const {
@@ -21,7 +22,11 @@ const Stake = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [lockPeriod, setLockPeriod] = useState(7);
+  const { walletAddress } = useWallet();
 
+  const result = useBalance({
+    address: walletAddress as `0x${string}`,
+  });
   const lockOptions = [
     { days: 0, apy: "0%", multiplier: "1x" },
     { days: 7, apy: "6%", multiplier: "1x" },
@@ -127,7 +132,10 @@ const Stake = () => {
                 </button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Balance: 10.0 ETH
+                Balance:{" "}
+                {result.data?.value
+                  ? formatEther(result.data?.value).slice(0, 8)
+                  : "N/A"}
               </p>
             </div>
 
