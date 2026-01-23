@@ -27,7 +27,7 @@ const Dashboard = () => {
     address: walletAddress as `0x${string}`,
   });
 
-  console.log("------", formatEther(result.data?.value!));
+  console.log("------", formatEther(result?.data?.value ?? BigInt(1234)));
   console.log(walletAddress);
 
   const {
