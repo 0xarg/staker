@@ -125,7 +125,13 @@ const Stake = () => {
                   className="w-full p-4 bg-muted border-[3px] border-foreground text-2xl font-bold focus:outline-none focus:border-primary"
                 />
                 <button
-                  onClick={() => setAmount("10.0")}
+                  onClick={() =>
+                    setAmount(
+                      result.data?.value
+                        ? formatEther(result.data?.value).slice(0, 8)
+                        : "N/A",
+                    )
+                  }
                   className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase border-[2px] border-foreground"
                 >
                   MAX

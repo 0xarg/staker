@@ -28,7 +28,13 @@ const Rewards = () => {
     functionName: "userRewards",
     args: [walletAddress],
   });
-
+  console.log(walletAddress);
+  console.log(userRewards);
+  if (isSuccess) {
+    console.log("Success");
+  } else if (error) {
+    console.log("error");
+  }
   const rewardsSummary = {
     totalEarned:
       userRewards && typeof userRewards === "bigint"
