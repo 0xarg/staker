@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { STAKING_PROXY } from "@/lib/config";
 import { useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
-import { formatEther } from "viem";
+import { formatEther, formatUnits } from "viem";
 
 const Rewards = () => {
   const { walletAddress } = useWallet();
@@ -22,14 +22,18 @@ const Rewards = () => {
     data: hash,
     error,
   } = useWriteContract();
-  const { data: userRewards, refetch: refreshRewards } = useReadContract({
-    address: STAKING_PROXY,
-    abi,
-    functionName: "userRewards",
-    args: [walletAddress],
-  });
+  let balance;
+  if (walletAddress) {
+    const { data, refetch: refreshRewards } = useReadContract({
+      address: STAKING_PROXY,
+      abi,
+      functionName: "userRewards",
+      args: ["0x44727Df9Ee240dffE283a4946dcce33D825A0563"],
+    });
+    balance = data;
+  }
   console.log(walletAddress);
-  console.log(userRewards);
+  console.log("Balance:", balance);
   if (isSuccess) {
     console.log("Success");
   } else if (error) {
@@ -37,16 +41,16 @@ const Rewards = () => {
   }
   const rewardsSummary = {
     totalEarned:
-      userRewards && typeof userRewards === "bigint"
-        ? formatEther(userRewards).slice(0, 4)
+      balance && typeof balance === "bigint"
+        ? formatEther(balance).slice(0, 4)
         : "0",
     claimable:
-      userRewards && typeof userRewards === "bigint"
-        ? formatEther(userRewards).slice(0, 4)
+      balance && typeof balance === "bigint"
+        ? formatEther(balance).slice(0, 4)
         : "0",
     pending:
-      userRewards && typeof userRewards === "bigint"
-        ? formatEther(userRewards).slice(0, 4)
+      balance && typeof balance === "bigint"
+        ? formatEther(balance).slice(0, 4)
         : "0",
     nextReward: " ",
   };
