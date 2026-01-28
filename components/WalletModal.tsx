@@ -1,28 +1,16 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useConnect, useConnectors } from "wagmi";
-
-// interface WalletOption {
-//   name: string;
-//   icon: string;
-// }
+import { useConnect } from "wagmi";
 
 interface WalletModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// const wallets: WalletOption[] = [
-//   { name: "MetaMask", icon: "🦊" },
-//   { name: "WalletConnect", icon: "🔗" },
-//   { name: "Coinbase Wallet", icon: "💰" },
-//   { name: "Phantom", icon: "👻" },
-// ];
-
 const WalletModal = ({ isOpen, onClose }: WalletModalProps) => {
-  const connectors = useConnectors();
-  const connect = useConnect();
+  const { connect, connectors } = useConnect();
+  console.log(connectors);
 
   return (
     <AnimatePresence>
@@ -74,9 +62,9 @@ const WalletModal = ({ isOpen, onClose }: WalletModalProps) => {
               <div className="space-y-3">
                 {connectors.map((connector, index) => (
                   <motion.button
-                    key={connector.name}
+                    key={connector.uid}
                     onClick={() => {
-                      connect.mutate({ connector });
+                      connect({ connector });
                       onClose();
                     }}
                     className="w-full flex items-center gap-4 p-4 bg-secondary border-[2px] border-muted-foreground hover:border-primary transition-colors text-popover-foreground"
@@ -86,9 +74,20 @@ const WalletModal = ({ isOpen, onClose }: WalletModalProps) => {
                     whileHover={{ scale: 1.02, x: 4 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    {/* <span className="text-3xl">{wallet.icon}</span> */}
-                    {connector.icon && (
-                      <img className="h-5 w-5" src={connector.icon} alt=" s" />
+                    {connector.icon ? (
+                      <img
+                        className="h-8 w-8"
+                        src={connector.icon}
+                        alt={connector.name}
+                      />
+                    ) : (
+                      <img
+                        className="h-8 w-8"
+                        src={
+                          "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg"
+                        }
+                        alt={connector.name}
+                      />
                     )}
                     <span className="font-bold uppercase">
                       {connector.name}

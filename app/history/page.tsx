@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   History as HistoryIcon,
@@ -13,11 +13,12 @@ import Navbar from "@/components/Navbar";
 import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@/contexts/WalletContext";
 import { toast } from "@/hooks/use-toast";
+import PageLoader from "@/components/PageLoader";
 
 const History = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [filter, setFilter] = useState("all");
-  const { connect } = useWallet();
+  const [loading, setLoading] = useState(true);
 
   const transactions = [
     {
@@ -87,7 +88,13 @@ const History = () => {
         return null;
     }
   };
-
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+  if (loading) {
+    return <PageLoader />;
+  }
   return (
     <div className="min-h-screen bg-background">
       <Navbar onConnectClick={() => setIsWalletModalOpen(true)} />
@@ -256,10 +263,6 @@ const History = () => {
       <WalletModal
         isOpen={isWalletModalOpen}
         onClose={() => setIsWalletModalOpen(false)}
-        onSelectWallet={(wallet) => {
-          connect(wallet);
-          toast({ title: "Connected", description: `Connected via ${wallet}` });
-        }}
       />
     </div>
   );

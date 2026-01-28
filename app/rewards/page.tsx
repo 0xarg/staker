@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Gift, TrendingUp, Clock, Zap, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -10,9 +10,12 @@ import { STAKING_PROXY } from "@/lib/config";
 import { useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
 import { formatEther, formatUnits } from "viem";
+import PageLoader from "@/components/PageLoader";
 
 const Rewards = () => {
   const { walletAddress } = useWallet();
+  const [loading, setLoading] = useState(true);
+
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
   const {
@@ -22,36 +25,26 @@ const Rewards = () => {
     data: hash,
     error,
   } = useWriteContract();
-  let balance;
-  if (walletAddress) {
-    const { data, refetch: refreshRewards } = useReadContract({
-      address: STAKING_PROXY,
-      abi,
-      functionName: "userRewards",
-      args: ["0x44727Df9Ee240dffE283a4946dcce33D825A0563"],
-    });
-    balance = data;
-  }
-  console.log(walletAddress);
-  console.log("Balance:", balance);
-  if (isSuccess) {
-    console.log("Success");
-  } else if (error) {
-    console.log("error");
-  }
+  const { data: userRewards, refetch: refreshRewards } = useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "userRewards",
+    args: [walletAddress],
+  });
+
   const rewardsSummary = {
     totalEarned:
-      balance && typeof balance === "bigint"
-        ? formatEther(balance).slice(0, 4)
-        : "0",
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards).slice(0, 8)
+        : "0", // Changed from 18 to 16
     claimable:
-      balance && typeof balance === "bigint"
-        ? formatEther(balance).slice(0, 4)
-        : "0",
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards).slice(0, 8)
+        : "0", // Changed from 18 to 16
     pending:
-      balance && typeof balance === "bigint"
-        ? formatEther(balance).slice(0, 4)
-        : "0",
+      userRewards && typeof userRewards === "bigint"
+        ? formatEther(userRewards).slice(0, 8)
+        : "0", // Changed from 18 to 16
     nextReward: " ",
   };
 
@@ -91,6 +84,8 @@ const Rewards = () => {
   const handleClaim = () => {
     mutate({
       address: STAKING_PROXY,
+      gas: 300000n,
+
       abi,
       functionName: "claimReward",
     });
@@ -108,6 +103,13 @@ const Rewards = () => {
       });
     }
   };
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+  if (loading) {
+    return <PageLoader />;
+  }
 
   return (
     <div className="min-h-screen bg-background">

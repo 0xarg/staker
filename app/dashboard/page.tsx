@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Coins,
@@ -19,10 +19,13 @@ import { useBalance, useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
 import { formatEther, parseEther } from "viem";
 import { STAKING_PROXY } from "@/lib/config";
+import PageLoader from "@/components/PageLoader";
 
 const Dashboard = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { walletAddress } = useWallet();
+  const [loading, setLoading] = useState(true);
+
   const result = useBalance({
     address: walletAddress as `0x${string}`,
   });
@@ -91,7 +94,7 @@ const Dashboard = () => {
       label: "CLAIMABLE REWARDS",
       value:
         userRewards && typeof userRewards === "bigint"
-          ? formatEther(userRewards)
+          ? formatEther(userRewards).slice(0, 8)
           : "0",
       unit: "ETH",
       icon: Gift,
@@ -127,6 +130,8 @@ const Dashboard = () => {
   const handleUnstake = () => {
     mutate({
       address: STAKING_PROXY,
+      gas: 300000n,
+
       abi,
       functionName: "unstake",
     });
@@ -135,8 +140,12 @@ const Dashboard = () => {
     }
   };
 
-  if (!walletAddress) {
-    return <div>Loading</div>;
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+  if (loading) {
+    return <PageLoader />;
   }
 
   return (

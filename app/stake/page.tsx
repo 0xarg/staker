@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, Clock, TrendingUp, AlertTriangle, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -10,6 +10,7 @@ import { STAKING_PROXY } from "@/lib/config";
 import { abi } from "@/lib/abi";
 import { formatEther, parseEther } from "viem";
 import { useWallet } from "@/contexts/WalletContext";
+import PageLoader from "@/components/PageLoader";
 
 const Stake = () => {
   const {
@@ -19,6 +20,8 @@ const Stake = () => {
     data: hash,
     error,
   } = useWriteContract();
+  const [loading, setLoading] = useState(true);
+
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [lockPeriod, setLockPeriod] = useState(7);
@@ -64,6 +67,8 @@ const Stake = () => {
       address: STAKING_PROXY,
       abi,
       functionName: "stake",
+      gas: 300000n,
+
       args: [lockPeriod * 24 * 60 * 60],
       value: BigInt(amountEth),
     });
@@ -82,6 +87,14 @@ const Stake = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 200);
+    return () => clearTimeout(timer);
+  }, []);
+  if (loading) {
+    return <PageLoader />;
+  }
 
   return (
     <div className="min-h-screen bg-background">

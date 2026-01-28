@@ -2,13 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { config } from "@/lib/config";
 import { useState } from "react";
-import {
-  useBalance,
-  useConnect,
-  useConnection,
-  useConnectors,
-  useDisconnect,
-} from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { disconnect, getConnection } from "wagmi/actions";
 import {
   Dialog,
@@ -24,15 +18,13 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 
 export function WalletOptions() {
-  const connect = useConnect();
-  const connection = useConnection();
-  const connectors = useConnectors();
-  const { connector } = getConnection(config);
-  const disconnect = useDisconnect(); // Use the hook for disconnection
+  const { connect, connectors } = useConnect();
+  const { address, connector } = useAccount();
+  const { disconnect } = useDisconnect();
 
   return (
     <div>
-      {!connection.address && (
+      {!address && (
         <Dialog>
           <DialogTrigger asChild>
             <Button>Connect to Wallet</Button>
@@ -47,7 +39,7 @@ export function WalletOptions() {
                   variant={"outline"}
                   key={connector.uid}
                   onClick={() => {
-                    connect.mutate({ connector });
+                    connect({ connector });
                   }}
                 >
                   {connector.name}
@@ -58,16 +50,14 @@ export function WalletOptions() {
         </Dialog>
       )}
 
-      {connection.address && (
+      {address && (
         <div className="flex gap-2">
           <Input
             disabled
-            value={connection.address.slice(0, 12) + "...."}
+            value={address.slice(0, 12) + "...."}
             className="w-fit"
           />
-          <Button onClick={() => disconnect.mutate({ connector })}>
-            Disconnect
-          </Button>
+          <Button onClick={() => disconnect({ connector })}>Disconnect</Button>
         </div>
       )}
 

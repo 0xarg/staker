@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -22,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import PageLoader from "./PageLoader";
 
 export function Dashboard() {
   const {
@@ -34,15 +34,20 @@ export function Dashboard() {
   const amountRef1 = useRef<HTMLInputElement>(null);
   const amountRef2 = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [balance, setBalance] = useState("");
 
   const { address } = useAccount();
 
-  const { data: balance, refetch } = useReadContract({
-    address: "0x9f82462BF164EDCD5f10F3596C3D9A307DBb3875",
-    abi,
-    functionName: "stakedBalance",
-    args: [address],
-  });
+  const loadData = () => {
+    const { data: balance, refetch } = useReadContract({
+      address: "0x9f82462BF164EDCD5f10F3596C3D9A307DBb3875",
+      abi,
+      functionName: "stakedBalance",
+      args: [address],
+    });
+    setBalance(balance as string);
+  };
+
   //   setBalance((stakedBal as bigint)?.toString() || "0");
 
   const handleStake = () => {
@@ -55,6 +60,8 @@ export function Dashboard() {
       address: "0x9f82462BF164EDCD5f10F3596C3D9A307DBb3875",
       abi,
       functionName: "stake",
+      gas: 300000n,
+
       args: [BigInt(amountEth)],
       value: BigInt(amountEth),
     });
@@ -73,17 +80,18 @@ export function Dashboard() {
     const amountEth = parseEther(amount ?? "0");
     console.log(amountEth);
 
-    await mutate({
+    mutate({
       address: "0x9f82462BF164EDCD5f10F3596C3D9A307DBb3875",
       abi,
       functionName: "unstake",
+      gas: 300000n,
       args: [BigInt(amountEth)],
       value: BigInt(amountEth),
     });
     if (error) {
       toast.error("Error UnStaking, check console for logs");
     }
-    refetch();
+    loadData();
     if (isSuccess) {
       toast.success("Successfully Unstaked eth,");
     }
@@ -91,10 +99,12 @@ export function Dashboard() {
 
   const sync = useCallback(async () => {
     setLoading(true);
-    await refetch();
+    await loadData();
     setLoading(false);
-  }, [refetch]);
-
+  }, [loadData]);
+  if (loading) {
+    return <PageLoader />;
+  }
   return (
     <div className="h-screen w-screen flex gap-10 justify-center items-center">
       <Card className="w-full max-w-sm">
@@ -106,7 +116,7 @@ export function Dashboard() {
         </CardHeader>
         <CardContent className="bg-neutral-100 text-center rounded-md py-3 px-2">
           <p className="font-semibold">
-            {formatEther((balance as bigint) ?? "0n")} ETH
+            {formatEther(BigInt(balance) ?? "0n")} ETH
           </p>
         </CardContent>
         <CardFooter>
