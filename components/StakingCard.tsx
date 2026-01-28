@@ -21,11 +21,12 @@ const StakingCard = ({
   onUnstake,
   onClaim,
 }: StakingCardProps) => {
-  let isLocked; // Mock locked state
-  console.log(lockPeriod);
+  let diffTime = new Date(Number(lockPeriod) * 1000).getTime() - Date.now(); // Mock locked state
+  let isLocked;
+  // console.log(new Date(Number(lockPeriod) * 1000).getTime() - Date.now());
 
-  if (lockPeriod) {
-    isLocked = false;
+  if (diffTime > 0) {
+    isLocked = true;
   } else {
     isLocked = false;
   }
@@ -87,7 +88,7 @@ const StakingCard = ({
       </div>
 
       {/* Lock Progress */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2 text-sm uppercase font-semibold">
             <Clock size={16} />
@@ -106,7 +107,7 @@ const StakingCard = ({
         <p className="text-xs text-muted-foreground mt-2 uppercase">
           Unlocks on {new Date(Number(lockPeriod) * 1000).toDateString()}
         </p>
-      </div>
+      </div> */}
 
       {/* Action Buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

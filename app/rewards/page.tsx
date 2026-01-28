@@ -45,7 +45,6 @@ const Rewards = () => {
       userRewards && typeof userRewards === "bigint"
         ? formatEther(userRewards).slice(0, 8)
         : "0", // Changed from 18 to 16
-    nextReward: " ",
   };
 
   const rewardHistory = [
@@ -84,7 +83,8 @@ const Rewards = () => {
   const handleClaim = () => {
     mutate({
       address: STAKING_PROXY,
-      gas: 300000n,
+      gas: 600000n, // Force higher gas limit
+      gasPrice: undefined, //
 
       abi,
       functionName: "claimReward",
@@ -197,28 +197,6 @@ const Rewards = () => {
               </div>
             </div>
           </motion.div>
-
-          <motion.div
-            className="stat-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ y: -4 }}
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                  NEXT REWARD
-                </p>
-                <p className="text-3xl font-bold font-mono">
-                  {rewardsSummary.nextReward}
-                </p>
-              </div>
-              <div className="p-2 border-[2px] border-foreground bg-destructive text-destructive-foreground">
-                <Clock size={24} />
-              </div>
-            </div>
-          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -264,53 +242,12 @@ const Rewards = () => {
           >
             <h3 className="font-bold uppercase mb-4">📊 REWARD HISTORY</h3>
 
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-[2px] border-foreground">
-                    <th className="text-left py-3 text-xs uppercase tracking-wider text-muted-foreground">
-                      Date
-                    </th>
-                    <th className="text-left py-3 text-xs uppercase tracking-wider text-muted-foreground">
-                      Type
-                    </th>
-                    <th className="text-right py-3 text-xs uppercase tracking-wider text-muted-foreground">
-                      Amount
-                    </th>
-                    <th className="text-right py-3 text-xs uppercase tracking-wider text-muted-foreground">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rewardHistory.map((reward, index) => (
-                    <motion.tr
-                      key={index}
-                      className="border-b border-muted"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <td className="py-4 text-sm">{reward.date}</td>
-                      <td className="py-4 text-sm">{reward.type}</td>
-                      <td className="py-4 text-sm text-right font-bold text-accent">
-                        {reward.amount}
-                      </td>
-                      <td className="py-4 text-right">
-                        <span
-                          className={`px-2 py-1 text-xs font-bold uppercase border-[2px] border-foreground ${
-                            reward.status === "Claimed"
-                              ? "bg-accent text-accent-foreground"
-                              : "bg-primary text-primary-foreground"
-                          }`}
-                        >
-                          {reward.status}
-                        </span>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-3">
+              <div className="h-50 flex items-center justify-center bg-muted border-[2px] border-foreground">
+                <p className="text-muted-foreground uppercase text-sm">
+                  Coming Soon
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>

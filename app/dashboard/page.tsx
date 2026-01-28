@@ -20,6 +20,7 @@ import { abi } from "@/lib/abi";
 import { formatEther, parseEther } from "viem";
 import { STAKING_PROXY } from "@/lib/config";
 import PageLoader from "@/components/PageLoader";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -30,8 +31,7 @@ const Dashboard = () => {
     address: walletAddress as `0x${string}`,
   });
 
-  console.log("------", formatEther(result?.data?.value ?? BigInt(1234)));
-  console.log(walletAddress);
+  const router = useRouter();
 
   const {
     mutate,
@@ -207,7 +207,10 @@ const Dashboard = () => {
               lockPeriod={unstakeTime ? (unstakeTime as string) : ""}
               userReward={userRewards ? (userRewards as string) : ""}
               userStaked={userStaked ? (userStaked as string) : ""}
-              onStake={() => toast({ title: "Opening stake dialog..." })}
+              onStake={() => {
+                toast({ title: "Opening stake dialog..." });
+                router.push("/stake");
+              }}
               onUnstake={() => handleUnstake()}
               onClaim={() => toast({ title: "Claiming rewards..." })}
             />
@@ -231,28 +234,15 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-3">
-              {recentActivity.map((activity, index) => (
-                <div
-                  key={index}
-                  className="p-3 bg-muted border-[2px] border-foreground flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-semibold text-sm uppercase">
-                      {activity.type}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-accent">{activity.amount}</p>
-                  </div>
-                </div>
-              ))}
+              <div className="h-48 flex items-center justify-center bg-muted border-[2px] border-foreground">
+                <p className="text-muted-foreground uppercase text-sm">
+                  Coming Soon
+                </p>
+              </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-6 space-y-2">
+            {/* <div className="mt-6 space-y-2">
               <Link href="/stake">
                 <motion.button
                   className="w-full btn-primary-web3"
@@ -271,7 +261,7 @@ const Dashboard = () => {
                   🎁 VIEW REWARDS
                 </motion.button>
               </Link>
-            </div>
+            </div> */}
           </motion.div>
         </div>
 

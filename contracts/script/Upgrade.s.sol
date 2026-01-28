@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import {Staking} from "../src/Staking.sol";
-import {StakingV2} from "../src/StakingV2.sol";
+import {StakingV3} from "../src/StakingV3.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
@@ -15,7 +15,7 @@ contract Upgrade is Script {
             .get_most_recent_deployment("ERC1967Proxy", block.chainid);
 
         vm.startBroadcast();
-        StakingV2 newAddy = new StakingV2(); //gets the address of contractB
+        StakingV3 newAddy = new StakingV3(); //gets the address of contractB
         vm.stopBroadcast();
         address proxy = upgradeAddress(
             mostRecentlyDeployedProxy,

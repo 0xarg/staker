@@ -21,7 +21,7 @@ const Navbar = ({ onConnectClick }: NavbarProps) => {
     { name: "Dashboard", path: "/dashboard" },
     { name: "Stake", path: "/stake" },
     { name: "Rewards", path: "/rewards" },
-    { name: "History", path: "/history" },
+    // { name: "History", path: "/history" },
   ];
 
   const formatAddress = (address: string) => {
