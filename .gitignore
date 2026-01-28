@@ -41,6 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # Foundry artifacts
-out/
-cache/
-broadcast/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
