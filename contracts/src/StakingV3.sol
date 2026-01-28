@@ -36,6 +36,19 @@ contract StakingV3 is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         lastUpdated[user] = block.timestamp;
     }
 
+    function syncReward() external {
+        _updateReward(msg.sender);
+    }
+
+    function availableRewards(address user) external view returns (uint256) {
+        uint256 staked = stakeBalance[user];
+        if (staked == 0) return 0;
+
+        uint256 timeElapsed = block.timestamp - lastUpdated[user];
+        uint256 reward = (staked * timeElapsed * 1e18) / (1e14 * 1 days);
+        return userRewards[user] + reward;
+    }
+
     function claimReward() external {
         _updateReward(msg.sender);
 
