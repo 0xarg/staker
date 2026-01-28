@@ -76,7 +76,7 @@ const Dashboard = () => {
         totalStaked && typeof totalStaked === "bigint"
           ? formatEther(totalStaked)
           : "0",
-      unit: "ETH",
+      unit: " ETH",
       icon: Coins,
       iconColor: "bg-primary text-primary-foreground",
     },
@@ -86,7 +86,7 @@ const Dashboard = () => {
         userStaked && typeof userStaked === "bigint"
           ? formatEther(userStaked)
           : "0",
-      unit: "ETH",
+      unit: " ETH",
       icon: Wallet,
       iconColor: "bg-accent text-accent-foreground",
     },
@@ -96,7 +96,7 @@ const Dashboard = () => {
         userRewards && typeof userRewards === "bigint"
           ? formatEther(userRewards).slice(0, 8)
           : "0",
-      unit: "ETH",
+      unit: " StakeX",
       icon: Gift,
       iconColor: "bg-primary text-primary-foreground",
     },
@@ -141,6 +141,9 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    if (!walletAddress) {
+      router.push("/");
+    }
     const timer = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(timer);
   }, []);
@@ -212,7 +215,10 @@ const Dashboard = () => {
                 router.push("/stake");
               }}
               onUnstake={() => handleUnstake()}
-              onClaim={() => toast({ title: "Claiming rewards..." })}
+              onClaim={() => {
+                toast({ title: "Claiming rewards..." });
+                router.push("/rewards");
+              }}
             />
           </div>
 

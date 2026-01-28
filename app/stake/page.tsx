@@ -11,6 +11,7 @@ import { abi } from "@/lib/abi";
 import { formatEther, parseEther } from "viem";
 import { useWallet } from "@/contexts/WalletContext";
 import PageLoader from "@/components/PageLoader";
+import { useRouter } from "next/navigation";
 
 const Stake = () => {
   const {
@@ -21,7 +22,7 @@ const Stake = () => {
     error,
   } = useWriteContract();
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [lockPeriod, setLockPeriod] = useState(7);
@@ -89,6 +90,9 @@ const Stake = () => {
   };
 
   useEffect(() => {
+    if (!walletAddress) {
+      router.push("/");
+    }
     const timer = setTimeout(() => setLoading(false), 200);
     return () => clearTimeout(timer);
   }, []);

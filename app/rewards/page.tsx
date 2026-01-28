@@ -11,8 +11,10 @@ import { useReadContract, useWriteContract } from "wagmi";
 import { abi } from "@/lib/abi";
 import { formatEther, formatUnits } from "viem";
 import PageLoader from "@/components/PageLoader";
+import { useRouter } from "next/navigation";
 
 const Rewards = () => {
+  const router = useRouter();
   const { walletAddress } = useWallet();
   const [loading, setLoading] = useState(true);
 
@@ -104,6 +106,9 @@ const Rewards = () => {
     }
   };
   useEffect(() => {
+    if (!walletAddress) {
+      router.push("/");
+    }
     const timer = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(timer);
   }, []);

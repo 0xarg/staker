@@ -39,7 +39,7 @@ const Navbar = ({ onConnectClick }: NavbarProps) => {
 
   const handleDisconnect = () => {
     disconnect();
-    console.log(isConnected);
+    router.push("/");
     setShowDropdown(false);
     toast({
       title: "Disconnected",
