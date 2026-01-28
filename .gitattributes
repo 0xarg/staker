@@ -1,0 +1,8 @@
+# Ignore vendored code
+contracts/lib/** linguist-vendored
+lib/** linguist-vendored
+
+# Ignore build artifacts (already removed, but future-proof)
+contracts/out/** linguist-generated
+contracts/cache/** linguist-generated
+contracts/broadcast/** linguist-generated
