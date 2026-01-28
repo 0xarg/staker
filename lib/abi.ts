@@ -8,6 +8,13 @@ export const abi = [
   },
   {
     type: "function",
+    name: "availableRewards",
+    inputs: [{ name: "user", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "claimReward",
     inputs: [],
     outputs: [],
@@ -72,6 +79,13 @@ export const abi = [
     inputs: [{ name: "", type: "address", internalType: "address" }],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "syncReward",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",

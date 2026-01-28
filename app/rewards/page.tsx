@@ -30,10 +30,14 @@ const Rewards = () => {
   const { data: userRewards, refetch: refreshRewards } = useReadContract({
     address: STAKING_PROXY,
     abi,
-    functionName: "userRewards",
+    functionName: "availableRewards",
     args: [walletAddress],
   });
-
+  useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "syncReward",
+  });
   const rewardsSummary = {
     totalEarned:
       userRewards && typeof userRewards === "bigint"

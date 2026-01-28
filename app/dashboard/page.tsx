@@ -46,6 +46,11 @@ const Dashboard = () => {
     abi,
     functionName: "totalStaked",
   });
+  useReadContract({
+    address: STAKING_PROXY,
+    abi,
+    functionName: "syncReward",
+  });
   const { data: userStaked, refetch: refreshUser } = useReadContract({
     address: STAKING_PROXY,
     abi,
@@ -61,7 +66,7 @@ const Dashboard = () => {
   const { data: userRewards, refetch: refreshRewards } = useReadContract({
     address: STAKING_PROXY,
     abi,
-    functionName: "userRewards",
+    functionName: "availableRewards",
     args: [walletAddress],
   });
 
