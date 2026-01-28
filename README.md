@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StakeX
 
-## Getting Started
+StakeX is an **upgradeable Ethereum staking protocol** with **time-based rewards**, an **ERC20 incentive token**, and a **production-ready Web3 frontend**.
 
-First, run the development server:
+The project demonstrates real-world Web3 patterns:
+
+- Upgradeable smart contracts (UUPS / ERC1967)
+- Lazy reward accounting
+- Secure staking + claiming flows
+- Wallet-agnostic frontend (MetaMask, WalletConnect, Phantom, Backpack)
+- Clean repository hygiene (no build artifacts committed)
+
+This is **not a demo contract** — it is structured the way production Web3 apps are built.
+
+---
+
+## ✨ Features
+
+### Smart Contracts
+
+- 🔐 **Upgradeable architecture** using OpenZeppelin UUPS (ERC1967)
+- ⏱ **Time-based staking rewards** (accrue continuously over time)
+- 🪙 **ERC20 reward token** minted on claim
+- ♻️ **Safe upgrade flow** with storage gap protection
+- 🧪 **Tested with Foundry**
+- 🚫 No hard-coded economics (reward rate configurable via logic)
+
+### Frontend
+
+- ⚛️ **Next.js (App Router)**
+- 🔗 **wagmi + viem** for contract interaction
+- 👛 Wallet support: MetaMask, WalletConnect, Phantom, Backpack
+- ⛽ Explicit gas handling for cross-wallet reliability
+- 🎞 Framer Motion animations
+- 📊 Live reward tracking & claim UX
+
+---
+
+## 🏗 Architecture Overview
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+contracts/
+├─ src/ # Solidity contracts
+│ ├─ Staking.sol # UUPS upgradeable staking logic
+│ ├─ StakingV2.sol # Upgraded implementation
+│ └─ StakeX.sol # ERC20 reward token
+├─ script/ # Deploy & upgrade scripts (Foundry)
+├─ test/ # Contract tests
+└─ foundry.toml
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend lives at the repo root using Next.js.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔐 Upgradeability Model
 
-## Learn More
+- **Proxy:** ERC1967Proxy
+- **Pattern:** UUPS
+- **Authorization:** `onlyOwner` via `_authorizeUpgrade`
+- **Storage safety:** Explicit storage gaps
 
-To learn more about Next.js, take a look at the following resources:
+Upgrades are performed without migrating user funds or state.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧮 Reward Model (High Level)
 
-## Deploy on Vercel
+- Rewards accrue continuously based on:
+  - Staked ETH
+  - Time elapsed
+- Accounting is **lazy** (updated on user interaction)
+- A view function computes **pending rewards** for accurate UI display
+- Rewards are minted only on claim
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This avoids unnecessary storage writes and reduces gas costs.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🚀 Deployment
+
+Contracts are deployed using **Foundry scripts**.
+
+Example:
+
+```bash
+forge script script/Deploy.s.sol \
+  --rpc-url $RPC_URL \
+  --broadcast \
+  --private-key $PRIVATE_KEY
+
+```
+
+Upgrades:
+
+```bash
+forge script script/Upgrade.s.sol \
+  --rpc-url $RPC_URL \
+  --broadcast \
+  --private-key $PRIVATE_KEY
+```
+
+🧪 Testing
+
+```bash
+forge test
+```
+
+Tests cover:
+
+Staking
+
+Unstaking
+
+Reward accrual
+
+Claim logic
+
+Upgrade safety
+
+🧹 Repo Hygiene
+
+The following are intentionally not committed:
+
+contracts/out
+
+contracts/cache
+
+contracts/broadcast
+
+All builds are reproducible locally.
+
+🛠 Tech Stack
+
+Solidity (0.8.x)
+
+OpenZeppelin Contracts & Upgradeable
+
+Foundry (Forge, Cast, Anvil)
+
+Next.js
+
+TypeScript / TSX
+
+wagmi + viem
+
+Framer Motion
+
+📌 Notes
+
+This project is built as a portfolio-grade Web3 system, not a tutorial.
+It focuses on correctness, upgrade safety, wallet compatibility, and real UX edge cases.
