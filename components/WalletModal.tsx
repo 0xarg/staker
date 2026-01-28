@@ -10,7 +10,7 @@ interface WalletModalProps {
 
 const WalletModal = ({ isOpen, onClose }: WalletModalProps) => {
   const { connect, connectors } = useConnect();
-  console.log(connectors);
+  connectors;
 
   return (
     <AnimatePresence>

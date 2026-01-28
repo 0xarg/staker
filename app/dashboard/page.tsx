@@ -70,10 +70,6 @@ const Dashboard = () => {
     args: [walletAddress],
   });
 
-  console.log("totalStaked", totalStaked);
-  console.log("userStaked", userStaked);
-  console.log("userRewards", userRewards);
-  console.log("UnStakeTime", unstakeTime);
   const stats = [
     {
       label: "TOTAL STAKED",

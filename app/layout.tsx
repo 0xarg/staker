@@ -4,6 +4,7 @@ import "./globals.css";
 import Provider from "@/components/Provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
       >
         <Provider>
           {children}
+          <Analytics />
           <Toaster />
           <Sonner />
         </Provider>

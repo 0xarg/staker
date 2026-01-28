@@ -23,7 +23,6 @@ const StakingCard = ({
 }: StakingCardProps) => {
   let diffTime = new Date(Number(lockPeriod) * 1000).getTime() - Date.now(); // Mock locked state
   let isLocked;
-  // console.log(new Date(Number(lockPeriod) * 1000).getTime() - Date.now());
 
   if (diffTime > 0) {
     isLocked = true;

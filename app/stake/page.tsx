@@ -50,7 +50,7 @@ const Stake = () => {
 
   const handleStake = () => {
     if (!amount) {
-      console.log("erro1");
+      console.log("error");
       toast({
         title: "Invalid Amount",
         description: "Minimum stake is 0.01 ETH",
@@ -58,8 +58,6 @@ const Stake = () => {
       return;
     }
     const amountEth = parseEther(amount ?? "0");
-    console.log(lockPeriod);
-    console.log(amountEth);
     toast({
       title: "Staking...",
       description: `Staking ${amount} ETH for ${lockPeriod} days`,
